@@ -1,0 +1,8 @@
+streamlit
+pandas
+rdkit
+joblib
+math
+streamlit-ketcher
+urlib
+sqlalchemy
