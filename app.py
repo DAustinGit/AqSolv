@@ -15,10 +15,9 @@ st.subheader("Draw your molecule below and click apply to predict solubility:")
 smiles1 = st_ketcher() 
 @st.cache_data(ttl=3600)
 def fetch(smiles2) -> pd.DataFrame:
-    data,e = db.fetch_data(SMILES = smiles2, column = "SMILES", table='mol_properties_exp') 
-    st.error(f"SMILES = {smiles2}, lenghth = {len (smiles2)}")
+    data = db.fetch_data(SMILES = smiles2, column = "SMILES", table='mol_properties_exp') 
     if data is None or (isinstance(data, pd.DataFrame) and data.empty):
-        st.error (e)
+    
         return None
     return data
 def push(mol_params):
@@ -50,10 +49,9 @@ def calc_properties(mol):
                                     'num_Nitrogen_Oxygen', 'mol_weight', 'LogP', 'aromatic proportion', 'TPSA'
                                 ])
       
-        fetched_data =  fetch(smiles2)
-        
         pipeline = joblib.load("AqSolv_model_v1")
         solubility_prediction = pipeline.predict(calc_params)
+        fetched_data =  fetch(smiles2)
         st.info(f"**predicted LogS (at 25°C):** `{solubility_prediction[0]:.2f}, {(pow(10,solubility_prediction[0])*mol_weight):.2f} g/L`")
         if  fetched_data is not None:
             st.success ("molecule found in database")
