@@ -66,7 +66,7 @@ print ("testing model")
 y_train_pred = pipeline.predict(x_train)
 y_test_pred = pipeline.predict(x_test)
 
-joblib.dump(pipeline, "solubilityML_model_v1")
+joblib.dump(pipeline, "AqSolv_model_v1")
 
 train_score = pipeline.score(x_train, y_train)
 train_MSE = mean_squared_error(y_train, y_train_pred)
