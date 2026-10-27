@@ -16,14 +16,14 @@ def fetch_data(column: str, SMILES: str,  table: str) -> pd.DataFrame:
     url = cnx()
     try:
         engine = create_engine(url)
-        
-        query_str = f'SELECT * FROM {table} WHERE TRIM(BOTH \' \t\r\n\' FROM "{column}") = :smiles_val'
+        cleaned_smiles = str(SMILES).replace('\r', '').replace('\n', '').strip()
+        query_str = f'SELECT * FROM {table} WHERE TRIM("{column}") = :smiles_val'
         query = text(query_str)
         print (query)
         with engine.connect() as connection:
             print("Successfully connected to Azure postgreSQL SQL Server via SQLAlchemy!")
             print (SMILES)
-            df = pd.read_sql(query, con=connection, params={"smiles_val":SMILES})
+            df = pd.read_sql(query, con=connection, params={"smiles_val":cleaned_smiles })
             if df.empty:
                 return None
             else:
