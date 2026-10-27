@@ -23,7 +23,8 @@ def fetch_data(column: str, SMILES: str,  table: str) -> pd.DataFrame:
         with engine.connect() as connection:
             print("Successfully connected to Azure postgreSQL SQL Server via SQLAlchemy!")
             print (SMILES)
-            df = pd.read_sql(query, con=connection, params={"smiles_val":cleaned_smiles })
+            result = connection.execute(query, {"smiles_val": cleaned_smiles})
+            df = pd.DataFrame(result.fetchall(), columns=result.keys())
             if df.empty:
                 return None
             else:
