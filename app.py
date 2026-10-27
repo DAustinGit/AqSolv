@@ -15,8 +15,10 @@ st.subheader("Draw your molecule below and click apply to predict solubility:")
 smiles1 = st_ketcher() 
 @st.cache_data(ttl=3600)
 def fetch(smiles2) -> pd.DataFrame:
-    data = db.fetch_data(SMILES = smiles2, column = "SMILES", table='mol_properties_exp') 
+    data,e = db.fetch_data(SMILES = smiles2, column = "SMILES", table='mol_properties_exp') 
+    st.error(f"SMILES = {smiles2}, lenghth = {len (smiles2)}")
     if data is None or (isinstance(data, pd.DataFrame) and data.empty):
+        st.error (e)
         return None
     return data
 def push(mol_params):
