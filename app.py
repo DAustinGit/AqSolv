@@ -9,8 +9,9 @@ import postgres_conn as db
 import math
 import joblib
 st.set_page_config(layout="wide")
-st.title("🧪 Interactive Molecular Descriptor Calculator")
-st.subheader("Draw your molecule below:")
+st.title("AqSolv V1")
+
+st.subheader("Draw your molecule below and click apply to predict solubility:")
 smiles1 = st_ketcher() 
 @st.cache_data(ttl=3600)
 def fetch(smiles2) -> pd.DataFrame:
@@ -51,13 +52,12 @@ def calc_properties(mol):
         
         pipeline = joblib.load("AqSolv_model_v1")
         solubility_prediction = pipeline.predict(calc_params)
-        st.info(f"**predicted LogS:** `{solubility_prediction[0]:.2f}, {(pow(10,solubility_prediction[0])*mol_weight):.2f} g/L`")
+        st.info(f"**predicted LogS (at 25°C):** `{solubility_prediction[0]:.2f}, {(pow(10,solubility_prediction[0])*mol_weight):.2f} g/L`")
         if  fetched_data is not None:
             st.success ("molecule found in database")
-            st.dataframe(fetched_data)
-            
+            st.dataframe(fetched_data)         
         else:
-            st.error ("Molecule not in database please add it below")
+            st.info ("Molecule not in database please add it below")
             with st.form("add molecule"):
                 solubility = st.text_input('Add solubility (g/L) at 25°C', value="0.0")
                 submit_button = st.form_submit_button("Add to database")
