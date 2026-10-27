@@ -17,7 +17,7 @@ def fetch_data(column: str, SMILES: str,  table: str) -> pd.DataFrame:
     try:
         engine = create_engine(url)
         
-        query_str = f'SELECT * FROM {table} WHERE TRIM ("{column}") COLLATE "C" = :smiles_val'
+        query_str = f'SELECT * FROM {table} WHERE TRIM("{column}") = :smiles_val'
         query = text(query_str)
         print (query)
         with engine.connect() as connection:
