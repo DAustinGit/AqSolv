@@ -5,3 +5,4 @@ joblib
 streamlit-ketcher
 sqlalchemy
 scikit-learn
+psycopg2-binary
