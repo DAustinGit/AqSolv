@@ -4,4 +4,4 @@ rdkit
 joblib
 streamlit-ketcher
 sqlalchemy
-sklearn
+scikit-learn
