@@ -23,16 +23,18 @@ def fetch_data(column: str, SMILES: str,  table: str) -> pd.DataFrame:
         with engine.connect() as connection:
             print("Successfully connected to Azure postgreSQL SQL Server via SQLAlchemy!")
             print (SMILES)
+            
             result = connection.execute(query, {"smiles_val": cleaned_smiles})
             df = pd.DataFrame(result.fetchall(), columns=result.keys())
             if df.empty:
                 return None
             else:
-                return df
+                 return df,None
+            
             
     except Exception as e:
         print(f"Error connecting to database: {e}")
-        return pd.DataFrame()
+        return pd.DataFrame(),e
 
 def push_data (data: pd.DataFrame, table: str):
     url = cnx()
