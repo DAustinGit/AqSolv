@@ -3,5 +3,4 @@ pandas
 rdkit
 joblib
 streamlit-ketcher
-urlib
 sqlalchemy
