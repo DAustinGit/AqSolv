@@ -17,7 +17,7 @@ def fetch_data(column: str, SMILES: str,  table: str) -> pd.DataFrame:
     try:
         engine = create_engine(url)
         cleaned_smiles = str(SMILES).replace('\r', '').replace('\n', '').strip()
-        query_str = f'SELECT * FROM {table} WHERE TRIM("{column}") = :smiles_val'
+        query_str = f'SELECT * FROM {table} WHERE "{column}" = :smiles_val'
         query = text(query_str)
         print (query)
         with engine.connect() as connection:
@@ -29,7 +29,7 @@ def fetch_data(column: str, SMILES: str,  table: str) -> pd.DataFrame:
             if df.empty:
                 return None
             else:
-                 return df,None
+                 return df
             
             
     except Exception as e:
