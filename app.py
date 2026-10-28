@@ -8,6 +8,10 @@ import pandas as pd
 import postgres_conn as db
 import math
 import joblib
+import authentication as auth
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
 st.set_page_config(layout="wide")
 st.title("AqSolv V1")
 
@@ -23,6 +27,58 @@ def fetch(smiles2) -> pd.DataFrame:
 def push(mol_params):
     db.push_data (mol_params, table='mol_properties_exp')
     print (mol_params)
+
+
+
+
+
+
+@st.dialog("please log in")
+def login_page():
+    message_placeholder = st.empty()
+
+    if "login_error" in st.session_state and st.session_state.login_error:
+        message_placeholder.error(st.session_state.login_error)
+        # Clear it so it doesn't persist forever
+        st.session_state.login_error = None
+    st.text_input("User Name", key= "user_name")
+    st.text_input("Password", key="password", type="password")
+    
+    if st.button ("submit"):
+        print (st.session_state.user_name)
+        user_auth = auth.password_check(st.session_state.user_name, st.session_state.password)
+        print (user_auth)
+        if user_auth == True:
+                st.session_state.logged_in = True
+                st.session_state.login_success_msg = "Log in successful!" 
+                print ("log in success!!")
+                st.rerun()
+        else:
+                st.session_state.logged_in = False
+                st.session_state.login_error = "Incorrect username or password"
+                print ("log in error")
+                
+
+
+@st.dialog("sign up")
+def signup_page():
+    message_placeholder = st.empty()
+    new_username = st.text_input("New Username")
+    new_password = st.text_input("Password", type="password")
+    confirm_password = st.text_input("Confirm password", type="password")
+    
+    if new_password == confirm_password:
+        if st.button ("Sign Up"):
+            result = auth.signup(new_username, new_password)
+            if result == True:
+                message_placeholder.success("Sign Up successful")
+
+    else:
+        message_placeholder.error(f"passwords do not match {new_username}")
+
+
+
+
 
 def calc_properties(mol):
      if mol is not None:
@@ -52,37 +108,64 @@ def calc_properties(mol):
         pipeline = joblib.load("AqSolv_model_v1")
         solubility_prediction = pipeline.predict(calc_params)
         fetched_data =  fetch(smiles2)
-        st.info(f"**predicted LogS (at 25°C):** `{solubility_prediction[0]:.2f}, {(pow(10,solubility_prediction[0])*mol_weight):.2f} g/L`")
+        col1, col2, col3, col4, col5 = st.columns(5, vertical_alignment="bottom")
+        with col1:
+            st.metric(label= "number of rotatable bonds", value=rotatable_bonds)
+            st.metric(label= "LogP", value=round(mol_logp,2))
+        with col2:
+            st.metric(label= "number of H Bond donors", value=H_Donors)
+            st.metric(label= "number of H Bond donors", value=H_Acceptors)
+        with col3:
+            st.metric(label= "Total Polar Surface Area", value=str(tpsa)+" \u00c5\u00b2")
+            st.metric(label= "molecular weight", value=str(round(mol_weight,2)) +" g/mol\u207b\u00b9")
+            
         if  fetched_data is not None:
             st.success ("molecule found in database")
-            st.dataframe(fetched_data)         
+            experimental_Logs = fetched_data['measured log(solubility:mol/L)'].iloc[0]
+            with col4:
+                st.metric(label= "predicted LogS", value=round(solubility_prediction[0],2))
+                st.metric(label= "predicted solubility", value=str(round(pow(10,solubility_prediction[0])*mol_weight,2))+" gL\u207b\u00b9")
+
+            with col5:
+                st.metric(label= "experimental LogS", value=experimental_Logs)
+                st.metric(label= "experimental solubility", value=str(round(pow(10,experimental_Logs)*mol_weight,2))+" gL\u207b\u00b9")
+                
+
+
+          
         else:
+            with col5:
+                st.metric(label= "predicted LogS", value=round(solubility_prediction[0],2))
+                st.metric(label= "predicted solubility", value=str(round(pow(10,solubility_prediction[0])*mol_weight,2))+" gL\u207b\u00b9")
             st.info ("Molecule not in database please add it below")
-            with st.form("add molecule"):
-                solubility = st.text_input('Add solubility (g/L) at 25°C', value="0.0")
-                submit_button = st.form_submit_button("Add to database")
-                if submit_button:
-                    try: 
-                        logS = math.log10((float(solubility)) / mol_weight)
-                        mol_params = pd.DataFrame([[
-                            formula, logS, smiles2, rotatable_bonds, H_Acceptors, 
-                            H_Donors, Nitrogen_Oxygen, mol_weight, mol_logp, 
-                            aromatic_proportion, tpsa
-                        ]], columns=[
-                            'Compound_ID','measured log(solubility:mol/L)','SMILES',
-                            'num_Rotatable_Bonds','num_H_Bond_Acceptors', 'num_H_Bond_Doners', 
-                            'num_Nitrogen_Oxygen', 'mol_weight', 'LogP', 'aromatic proportion', 'TPSA'
-                        ])
-                                
-                        
-                        push(mol_params)
-                        st.success("Successfully added to database! Refreshing...")
-                        st.cache_data.clear() # Clear cache so it fetches fresh on rerun
-                        st.rerun()
-                    except ValueError:
-                        st.warning("Please enter a valid numeric value for solubility.")
-                    except Exception as e:
-                        st.error(f"Database Error: {e}")
+           
+
+            if st.session_state.logged_in == True:
+                 with st.form("add molecule"):    
+                    solubility = st.text_input('Add solubility (g/L) at 25°C', value="0.0")
+                    submit_button = st.form_submit_button("Add to database")
+                    if submit_button:
+                        try: 
+                            logS = math.log10((float(solubility)) / mol_weight)
+                            mol_params = pd.DataFrame([[
+                                formula, logS, smiles2, rotatable_bonds, H_Acceptors, 
+                                H_Donors, Nitrogen_Oxygen, mol_weight, mol_logp, 
+                                aromatic_proportion, tpsa
+                            ]], columns=[
+                                'Compound_ID','measured log(solubility:mol/L)','SMILES',
+                                'num_Rotatable_Bonds','num_H_Bond_Acceptors', 'num_H_Bond_Doners', 
+                                'num_Nitrogen_Oxygen', 'mol_weight', 'LogP', 'aromatic proportion', 'TPSA'
+                            ])
+                                    
+                            
+                            push(mol_params)
+                            st.success("Successfully added to database! Refreshing...")
+                            st.cache_data.clear() # Clear cache so it fetches fresh on rerun
+                            st.rerun()
+                        except ValueError:
+                            st.warning("Please enter a valid numeric value for solubility.")
+                        except Exception as e:
+                            st.error(f"Database Error: {e}")
 
      else:
         st.error("The drawn structure is not completely recognized yet. Keep drawing!")
@@ -91,3 +174,19 @@ if smiles1:
     mol = Chem.MolFromSmiles(smiles1)
     smiles2 = Chem.MolToSmiles(mol, kekuleSmiles=False)
     calc_properties(mol)
+
+with st.form("log in or sign up"):
+    col1, col2 = st.columns(2, vertical_alignment="bottom")
+    if st.session_state.logged_in == False:
+        
+        log_in = col1.form_submit_button("Log In")
+        sign_up = col2.form_submit_button("sign up")
+        if log_in:
+            login_page()
+        if sign_up:
+            signup_page()
+    if st.session_state.logged_in == True:
+        log_out = st.form_submit_button("Log out")
+        if log_out:
+            st.session_state.logged_in = False
+            st.rerun()
