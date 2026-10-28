@@ -52,11 +52,35 @@ def calc_properties(mol):
         pipeline = joblib.load("AqSolv_model_v1")
         solubility_prediction = pipeline.predict(calc_params)
         fetched_data =  fetch(smiles2)
-        st.info(f"**predicted LogS (at 25°C):** `{solubility_prediction[0]:.2f}, {(pow(10,solubility_prediction[0])*mol_weight):.2f} g/L`")
+        col1, col2, col3, col4, col5 = st.columns(5, vertical_alignment="bottom")
+        with col1:
+            st.metric(label= "number of rotatable bonds", value=rotatable_bonds)
+            st.metric(label= "LogP", value=round(mol_logp,2))
+        with col2:
+            st.metric(label= "number of H Bond donors", value=H_Donors)
+            st.metric(label= "number of H Bond donors", value=H_Acceptors)
+        with col3:
+            st.metric(label= "Total Polar Surface Srea", value=tpsa)
+            st.metric(label= "molecular weight", value=str(round(mol_weight,2)) +" g/mol")
+            
         if  fetched_data is not None:
             st.success ("molecule found in database")
-            st.dataframe(fetched_data)         
+            experimental_Logs = fetched_data['measured log(solubility:mol/L)'].iloc[0]
+            with col4:
+                st.metric(label= "predicted LogS", value=round(solubility_prediction[0],2))
+                st.metric(label= "predicted solubility", value=str(round(pow(10,solubility_prediction[0])*mol_weight,2))+" g/L")
+
+            with col5:
+                st.metric(label= "experimental LogS", value=experimental_Logs)
+                st.metric(label= "experimental solubility", value=str(round(pow(10,experimental_Logs)*mol_weight,2))+" g/L")
+                
+
+
+          
         else:
+            with col5:
+                st.metric(label= "predicted Log S", value=round(solubility_prediction[0],2))
+                st.metric(label= "predicted solubility", value=str(round(pow(10,solubility_prediction[0])*mol_weight,2))+" g/L")
             st.info ("Molecule not in database please add it below")
             with st.form("add molecule"):
                 solubility = st.text_input('Add solubility (g/L) at 25°C', value="0.0")
