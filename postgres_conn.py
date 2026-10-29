@@ -12,24 +12,33 @@ def cnx():
     connection_url = f"postgresql+psycopg2://{username}:{encoded_password}@{server}:5432/{database}?sslmode=require"
     return connection_url
 #=:smiles_val;
-def fetch_data(column: str, SMILES: str,  table: str) -> pd.DataFrame:    
+def fetch_data(column: str, SMILES: str,  table: str, users_table:str) -> pd.DataFrame:    
     url = cnx()
     try:
         engine = create_engine(url)
         cleaned_smiles = str(SMILES).replace('\r', '').replace('\n', '').strip()
-        query_str = f'SELECT * FROM {table} WHERE "{column}" = :smiles_val'
-        query = text(query_str)
-        print (query)
+        query_1 = f'SELECT * FROM {table} WHERE "{column}" = :smiles_val'
+        query_2 = f'SELECT * FROM {users_table} WHERE "{column}" = :smiles_val'
+        query1 = text(query_1)
+        query2 = text(query_2)
         with engine.connect() as connection:
             print("Successfully connected to Azure postgreSQL SQL Server via SQLAlchemy!")
             print (SMILES)
             
-            result = connection.execute(query, {"smiles_val": cleaned_smiles})
+            result = connection.execute(query1, {"smiles_val": cleaned_smiles})
+            
             df = pd.DataFrame(result.fetchall(), columns=result.keys())
             if df.empty:
-                return None
+                result = connection.execute(query2, {"smiles_val": cleaned_smiles})
+                df = pd.DataFrame(result.fetchall(), columns=result.keys())
+                if df.empty:
+                    return None
+                else:
+                    return df
             else:
-                 return df
+                return df
+
+                 
             
             
     except Exception as e:
@@ -52,7 +61,7 @@ def push_data (data: pd.DataFrame, table: str):
                 method='multi',          
                 chunksize=1      
             )
-            connection.comit()
+            connection.commit()
                 
     except Exception as e:
         print(f"Error connecting to database: {e}")

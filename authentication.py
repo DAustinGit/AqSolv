@@ -1,10 +1,8 @@
 
 import urllib
-import pandas as pd
 from sqlalchemy import create_engine, text, MetaData, Table, Column, String, insert, Integer, select
 import streamlit as st
 import bcrypt
-import re
 metadata=MetaData()
 users = Table("users", metadata,
                   Column("userid", Integer, primary_key=True, autoincrement=True),
@@ -27,12 +25,13 @@ def password_check(username:str, provided_password):
     try:
         engine = create_engine(url)
         with engine.connect() as conn:  
-            stmt= select(users.c.password_hash).where(users.c.username == username)
+            stmt= select(users.c.password_hash, users.c.userid).where(users.c.username == username)
             result = conn.execute(stmt).fetchone()
             stored_hash_string = result[0]
+            userid= result[1]
             if result is None:
                 print("Login failed: User not found.")
-                return False
+                return False,None
     except Exception as e:
         return e
     provided_password_bytes = provided_password.encode('utf-8')
@@ -41,9 +40,9 @@ def password_check(username:str, provided_password):
     try: 
         bcrypt.checkpw(provided_password_bytes, stored_hash_string.encode('utf-8'))
         print("Login successful!")
-        return True
+        return True,userid
     except:
-        return False
+        return False,None
 
 
 
