@@ -11,6 +11,7 @@ import joblib
 import authentication as auth
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+    st.session_state.userid = None
 
 st.set_page_config(layout="wide")
 st.title("AqSolv V1")
@@ -19,13 +20,13 @@ st.subheader("Draw your molecule below and click apply to predict solubility:")
 smiles1 = st_ketcher() 
 @st.cache_data(ttl=3600)
 def fetch(smiles2) -> pd.DataFrame:
-    data = db.fetch_data(SMILES = smiles2, column = "SMILES", table='mol_properties_exp') 
+    data = db.fetch_data(SMILES = smiles2, column = "SMILES", table='mol_properties_exp', users_table='user_mols') 
     if data is None or (isinstance(data, pd.DataFrame) and data.empty):
     
         return None
     return data
 def push(mol_params):
-    db.push_data (mol_params, table='mol_properties_exp')
+    db.push_data (mol_params, table='user_mols')
     print (mol_params)
 
 
@@ -46,15 +47,17 @@ def login_page():
     
     if st.button ("submit"):
         print (st.session_state.user_name)
-        user_auth = auth.password_check(st.session_state.user_name, st.session_state.password)
-        print (user_auth)
+        user_auth,userid = auth.password_check(st.session_state.user_name, st.session_state.password)
+        print (user_auth,userid)
         if user_auth == True:
                 st.session_state.logged_in = True
                 st.session_state.login_success_msg = "Log in successful!" 
+                st.session_state.userid = userid
                 print ("log in success!!")
                 st.rerun()
         else:
                 st.session_state.logged_in = False
+                st.session_state.userid = None
                 st.session_state.login_error = "Incorrect username or password"
                 print ("log in error")
                 
@@ -127,7 +130,7 @@ def calc_properties(mol):
                 st.metric(label= "predicted solubility", value=str(round(pow(10,solubility_prediction[0])*mol_weight,2))+" gL\u207b\u00b9")
 
             with col5:
-                st.metric(label= "experimental LogS", value=experimental_Logs)
+                st.metric(label= "experimental LogS", value=round(experimental_Logs,2))
                 st.metric(label= "experimental solubility", value=str(round(pow(10,experimental_Logs)*mol_weight,2))+" gL\u207b\u00b9")
                 
 
@@ -140,7 +143,7 @@ def calc_properties(mol):
             st.info ("Molecule not in database please add it below")
            
 
-            if st.session_state.logged_in == True:
+            if st.session_state.logged_in == True and st.session_state.userid is not None:
                  with st.form("add molecule"):    
                     solubility = st.text_input('Add solubility (g/L) at 25°C', value="0.0")
                     submit_button = st.form_submit_button("Add to database")
@@ -150,11 +153,11 @@ def calc_properties(mol):
                             mol_params = pd.DataFrame([[
                                 formula, logS, smiles2, rotatable_bonds, H_Acceptors, 
                                 H_Donors, Nitrogen_Oxygen, mol_weight, mol_logp, 
-                                aromatic_proportion, tpsa
+                                aromatic_proportion, tpsa, st.session_state.userid
                             ]], columns=[
                                 'Compound_ID','measured log(solubility:mol/L)','SMILES',
                                 'num_Rotatable_Bonds','num_H_Bond_Acceptors', 'num_H_Bond_Doners', 
-                                'num_Nitrogen_Oxygen', 'mol_weight', 'LogP', 'aromatic proportion', 'TPSA'
+                                'num_Nitrogen_Oxygen', 'mol_weight', 'LogP', 'aromatic proportion', 'TPSA', 'userid'
                             ])
                                     
                             
@@ -189,4 +192,5 @@ with st.form("log in or sign up"):
         log_out = st.form_submit_button("Log out")
         if log_out:
             st.session_state.logged_in = False
+            st.session_state.userid = None
             st.rerun()
