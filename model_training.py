@@ -17,10 +17,6 @@ def fetch_data(database: str, table: str) -> pd.DataFrame:
     server = st.secrets['server'] 
     username = st.secrets['username'] 
     password = st.secrets['password']  
-      # <-- Replace with your actual password
-    
-    # 1. Safely URL-encode the pyodbc connection string parameters
-    # This prevents errors if your password contains special characters (like @, #, or :)
 
     encoded_password = urllib.parse.quote_plus(password)
     connection_url = f"postgresql+psycopg2://{username}:{encoded_password}@{server}:5432/{database}?sslmode=require"
@@ -71,7 +67,7 @@ joblib.dump(pipeline, "AqSolv_model_v1")
 train_score = pipeline.score(x_train, y_train)
 train_MSE = mean_squared_error(y_train, y_train_pred)
 test_MSE = mean_squared_error(y_test, y_test_pred)
-# 2. Calculate the score on the test data
+
 test_score = pipeline.score(x_test, y_test)
 
 print(f"Training R² Score: {train_score:.4f}")

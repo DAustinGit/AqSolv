@@ -1,0 +1,27 @@
+[33m521778d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/user_table[m[33m)[m HEAD@{0}: commit (amend): chore: move database and authentication scripts to src
+[33m157ed02[m[33m ([m[1;31morigin/feature/user_table[m[33m)[m HEAD@{1}: commit: user tables
+[33m2e5ba35[m[33m ([m[1;31morigin/login[m[33m, [m[1;32mlogin[m[33m)[m HEAD@{2}: checkout: moving from login to feature/user_table
+[33m2e5ba35[m[33m ([m[1;31morigin/login[m[33m, [m[1;32mlogin[m[33m)[m HEAD@{3}: commit: version 1.1
+[33ma75f847[m HEAD@{4}: commit: login added
+[33m7c73943[m[33m ([m[1;31morigin/improved_UI[m[33m, [m[1;32mimproved_UI[m[33m)[m HEAD@{5}: checkout: moving from improved_UI to login
+[33m7c73943[m[33m ([m[1;31morigin/improved_UI[m[33m, [m[1;32mimproved_UI[m[33m)[m HEAD@{6}: commit: improved UI
+[33m9ee66b0[m[33m ([m[1;31morigin/improve_interface[m[33m, [m[1;32mimprove_interface[m[33m, [m[1;32mdebugging[m[33m)[m HEAD@{7}: checkout: moving from improve_interface to improved_UI
+[33m9ee66b0[m[33m ([m[1;31morigin/improve_interface[m[33m, [m[1;32mimprove_interface[m[33m, [m[1;32mdebugging[m[33m)[m HEAD@{8}: checkout: moving from debugging to improve_interface
+[33m9ee66b0[m[33m ([m[1;31morigin/improve_interface[m[33m, [m[1;32mimprove_interface[m[33m, [m[1;32mdebugging[m[33m)[m HEAD@{9}: commit: initial commit
+[33m303894c[m HEAD@{10}: commit: psycopg2-binary added
+[33m9919855[m HEAD@{11}: commit: debugging
+[33m80380d6[m[33m ([m[1;31morigin/fix_SMILES[m[33m, [m[1;32mfix_SMILES[m[33m)[m HEAD@{12}: checkout: moving from fix_SMILES to debugging
+[33m80380d6[m[33m ([m[1;31morigin/fix_SMILES[m[33m, [m[1;32mfix_SMILES[m[33m)[m HEAD@{13}: commit: fix bug
+[33ma1d20ae[m HEAD@{14}: commit: SMILES cleaned
+[33m24773c5[m HEAD@{15}: commit: fix SMILES
+[33mcc8ed6f[m[33m ([m[1;32mupdate_interface[m[33m, [m[1;32mfix_search[m[33m)[m HEAD@{16}: checkout: moving from fix_search to fix_SMILES
+[33mcc8ed6f[m[33m ([m[1;32mupdate_interface[m[33m, [m[1;32mfix_search[m[33m)[m HEAD@{17}: checkout: moving from update_interface to fix_search
+[33mcc8ed6f[m[33m ([m[1;32mupdate_interface[m[33m, [m[1;32mfix_search[m[33m)[m HEAD@{18}: commit: fix database search
+[33meadc114[m HEAD@{19}: commit: fix database search
+[33mdaf2141[m[33m ([m[1;31morigin/update_interface[m[33m)[m HEAD@{20}: commit: add requirements
+[33m33d4124[m[33m ([m[1;31morigin/fix_bugs[m[33m, [m[1;32mfix_bugs[m[33m)[m HEAD@{21}: checkout: moving from fix_bugs to update_interface
+[33m33d4124[m[33m ([m[1;31morigin/fix_bugs[m[33m, [m[1;32mfix_bugs[m[33m)[m HEAD@{22}: commit: fix bugs
+[33ma290e01[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{23}: checkout: moving from main to fix_bugs
+[33ma290e01[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{24}: pull origin main --allow-unrelated-histories: Merge made by the 'ort' strategy.
+[33m7e6e3f1[m HEAD@{25}: Branch: renamed refs/heads/main to refs/heads/main
+[33m7e6e3f1[m HEAD@{27}: commit (initial): initial commit
