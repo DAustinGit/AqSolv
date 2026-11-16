@@ -1,8 +1,9 @@
 # AqSolv V1
 
-An interactive web app for predicting the **aqueous solubility** of small molecules. Draw a structure in the browser, and AqSolv calculates its key physicochemical properties and predicts its solubility in water using a trained machine learning model.
+An interactive web app for predicting the **aqueous solubility** of small molecules. Draw a structure in the browser, and AqSolv calculates key physicochemical properties and predicts water solubility using a trained machine learning model.
 
 Built with [Streamlit](https://streamlit.io/), [RDKit](https://www.rdkit.org/), and [Ketcher](https://github.com/epam/ketcher).
+[Data](https://github.com/dataprofessor/data/blob/master/delaney_solubility_with_descriptors.csv) inspiration from the [Chanin Nantasenamat](https://github.com/dataprofessor) 
 
 ---
 
@@ -55,17 +56,17 @@ When a user submits a measurement (in g/L at 25 °C), it is converted to LogS wi
 │    └── AqSolv_data.csv           # copy of data from postgres database
 │  
 ├── data preparation
-│    └── chem_properties.py       # generate calculated molecular descriptors from deleney datasetand push to database
-│                                   push to postreSQL databas 
+│    └── chem_properties.py       # generate calculated molecular descriptors from Delaney dataset and push to database
+│                                   push to PostgreSQL database 
 ├── app.py                        # Streamlit application (this file)
 ├── model/
 │   └── AqSolv_model_v1           # Trained model pipeline (joblib, Scikit-learn)
 |   └── model_training            # model training script
-├── develoment notebooks          # jupyter notebooks containing model selection and optemisation
-│    ├
-│    ├
-│    ├
-│    └                             
+├── development notebooks          # Jupyter notebooks containing model selection and optimisation
+│    ├── AqSolv_ensembles_extended_properties.ipynb   # development and optimisation of ensemble methods using AqSolv_data dataset
+│    ├── AqSolv_ensembles.ipynb                       # ensemble methods using Delaney dataset
+│    ├── AqSolv_simple_regression.ipynb               # simple linear regression models using Delaney dataset
+│                               
 └── src/
     ├── postgres_conn.py          # Database access (fetch_data, push_data)
     └── authentication.py         # Login / sign-up logic (password_check, signup)
@@ -74,7 +75,7 @@ When a user submits a measurement (in g/L at 25 °C), it is converted to LogS wi
 ---
 
 ## Getting started
- it's easy just go to <https://aqsolv-a3yekgdj68jxw4ipqoqnjp.streamlit.app/>!
+ It's easy; just go to <https://aqsolv-a3yekgdj68jxw4ipqoqnjp.streamlit.app/>!
 
 ### Prerequisites (local)
 
@@ -89,7 +90,7 @@ When a user submits a measurement (in g/L at 25 °C), it is converted to LogS wi
 git clone <your-repo-url>
 cd <your-repo-folder>
 
-# 2. (Recommended) create a virtual environment
+# 2. (Recommended) Create a virtual environment
 python -m venv venv
 source venv/bin/activate        # On Windows: venv\Scripts\activate
 
