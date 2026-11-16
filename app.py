@@ -5,10 +5,10 @@ from streamlit_ketcher import st_ketcher
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors, Descriptors, Lipinski
 import pandas as pd
-import postgres_conn as db
+from src import postgres_conn as db
 import math
 import joblib
-import authentication as auth
+from src import authentication as auth
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.userid = None
@@ -28,11 +28,6 @@ def fetch(smiles2) -> pd.DataFrame:
 def push(mol_params):
     db.push_data (mol_params, table='user_mols')
     print (mol_params)
-
-
-
-
-
 
 @st.dialog("please log in")
 def login_page():
@@ -62,7 +57,6 @@ def login_page():
                 print ("log in error")
                 
 
-
 @st.dialog("sign up")
 def signup_page():
     message_placeholder = st.empty()
@@ -81,8 +75,6 @@ def signup_page():
 
 
 
-
-
 def calc_properties(mol):
      if mol is not None:
         formula = rdMolDescriptors.CalcMolFormula(mol)
@@ -90,7 +82,6 @@ def calc_properties(mol):
         mol_logp = Descriptors.MolLogP(mol)
         rotatable_bonds = Lipinski.NumRotatableBonds(mol)        
         heavy_atom_count = Lipinski.HeavyAtomCount(mol)
-        
         aromatic_atoms = len([atom for atom in mol.GetAtoms() if atom.GetIsAromatic()])
         aromatic_proportion = (aromatic_atoms / heavy_atom_count) if heavy_atom_count > 0 else 0.0
         H_Acceptors = Lipinski.NumHAcceptors(mol)
@@ -108,7 +99,7 @@ def calc_properties(mol):
                                     'num_Nitrogen_Oxygen', 'mol_weight', 'LogP', 'aromatic proportion', 'TPSA'
                                 ])
       
-        pipeline = joblib.load("AqSolv_model_v1")
+        pipeline = joblib.load("model//AqSolv_model_v1")
         solubility_prediction = pipeline.predict(calc_params)
         fetched_data =  fetch(smiles2)
         col1, col2, col3, col4, col5 = st.columns(5, vertical_alignment="bottom")
@@ -133,8 +124,6 @@ def calc_properties(mol):
                 st.metric(label= "experimental LogS", value=round(experimental_Logs,2))
                 st.metric(label= "experimental solubility", value=str(round(pow(10,experimental_Logs)*mol_weight,2))+" gL\u207b\u00b9")
                 
-
-
           
         else:
             with col5:
@@ -172,12 +161,10 @@ def calc_properties(mol):
 
      else:
         st.error("The drawn structure is not completely recognized yet. Keep drawing!")
-
 if smiles1:
     mol = Chem.MolFromSmiles(smiles1)
     smiles2 = Chem.MolToSmiles(mol, kekuleSmiles=False)
     calc_properties(mol)
-
 with st.form("log in or sign up"):
     col1, col2 = st.columns(2, vertical_alignment="bottom")
     if st.session_state.logged_in == False:

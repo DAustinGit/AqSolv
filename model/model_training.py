@@ -35,7 +35,7 @@ def fetch_data(database: str, table: str) -> pd.DataFrame:
 df = fetch_data(database='solubility_training', table='mol_properties_exp')
 print (df.head)
 y = df['measured log(solubility:mol/L)']   # Y is feature used for training
-x = df.drop(['measured log(solubility:mol/L)', 'Compound_ID', 'SMILES'], axis=1)     #X is the feature we are predicting drop logS and axis = 1 --> work in coluns
+x = df.drop(['measured log(solubility:mol/L)', 'Compound_ID','created_at', 'userid', 'SMILES'], axis=1)     #X is the feature we are predicting drop logS and axis = 1 --> work in coluns
 
 x_train, x_test, y_train, y_test = train_test_split (x, y, test_size= 0.2, random_state = 100) #splits the data for train and test sets testing set is 20% of data
 print (x_train)
